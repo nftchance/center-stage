@@ -7,7 +7,7 @@ from imutils.video import FPS
 class Detector:
     def __init__(self, use_cuda=False):
         self.face_model = cv2.dnn.readNetFromCaffe(
-            'res10_300x300_ssd_iter_140000.prototxt', 'res10_300x300_ssd_iter_140000.caffemodel')
+            'models/res10_300x300_ssd_iter_140000.prototxt', 'models/res10_300x300_ssd_iter_140000.caffemodel')
 
         if use_cuda:
             self.face_model.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
