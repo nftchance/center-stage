@@ -4,7 +4,6 @@ import time
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-
 class FaceDetector():
     def __init__(self, cascade_path, confidence=0.5, target_face_percentage=90, debug=False):
         self.debug = debug
@@ -27,6 +26,11 @@ class FaceDetector():
             'models/res10_300x300_ssd_iter_140000.caffemodel'
         )
 
+        self.cyp = None
+        self.cxp = None
+
+        self.easing = 0.1
+
     def get_faces(self, img):
         blob = cv2.dnn.blobFromImage(
             img, 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
@@ -48,12 +52,28 @@ class FaceDetector():
         return faces
 
     def zoom_at(self, img, zoom=1, angle=0, coord=None):
-        cy, cx = [i/2 for i in img.shape[:-1]
-                  ] if coord is None else coord[::-1]
+        # focus on the center of previous frame + easing in the direction of the center of the face in the current image if no coord is given then use the center of the face in the current image
+        if not self.cxp:
+            self.cxp = coord[0]
+            self.cyp = coord[1]
 
+        if coord is None:
+            coord = (img.shape[1] / 2, img.shape[0] / 2)
+
+        cx = self.cxp + (coord[0] - self.cxp) * self.easing
+        cy = self.cyp + (coord[1] - self.cyp) * self.easing
+
+        # draw circle at current center
+        if self.debug:
+            cv2.circle(img, (int(cx), int(cy)), 3, (0, 0, 255), -1)
+
+        # get the center of the face in the previous frame
         rot_mat = cv2.getRotationMatrix2D((cx, cy), angle, zoom)
         result = cv2.warpAffine(
             img, rot_mat, img.shape[1::-1], flags=cv2.INTER_LINEAR)
+
+        self.cxp = cx
+        self.cyp = cy
 
         return result
 
@@ -71,6 +91,10 @@ class FaceDetector():
             face_percentage = (h / img.shape[0]) * 100
             zoom_factor = 1 + \
                 (1 - (face_percentage / self.target_face_percentage))
+
+            # draw rectangle around face
+            if self.debug:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
             img = self.zoom_at(
                 img,
@@ -107,7 +131,7 @@ class FaceDetector():
 
                 # Display FPS on frame
                 cv2.putText(img, "FPS: {:.2f}".format(
-                    fps), (0, 90), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                    fps), (0, 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
                 fps = f"{int(fps)}"
 
             # zoom in on face
@@ -124,10 +148,10 @@ class FaceDetector():
 
 def main():
     face = FaceDetector(
-        'models/haarcascade_frontalface_default.xml', 
+        'models/haarcascade_frontalface_default.xml',
         confidence=0.65,
-        target_face_percentage=90, 
-        debug=False
+        target_face_percentage=90,
+        debug=True
     )
     face.run()
 
