@@ -8,6 +8,8 @@ This is extremely resource intensive, so everything is handled on the GPU side o
 
 ## TODO
 
+- [ ] Figure out how to build a CUDA implementation that will work on all computers instead of just mine...
+    - [ ] This will always only work with NVIDIA GPUs?
 - [ ] Figure out how to get Python -> Executable File.
 - [ ] Figure out how to run app minimized in tray since all it really is, is a source connection.
 - [ ] Confirm that this would already work for things like OBS if one was to setup a `Window Capture` on this window.

@@ -2,10 +2,18 @@ import cv2
 import numpy
 import time
 
+from threading import Thread
+
 font = cv2.FONT_HERSHEY_SIMPLEX
 
-class FaceDetector():
-    def __init__(self, cascade_path, confidence=0.5, target_face_percentage=90, debug=False):
+DEFAULTS = {
+    'confidence': 0.65,
+    'target_face_percentage': 90,
+    'zoom': 1.0,
+}
+
+class FaceDetector(Thread):
+    def __init__(self, cascade_path, confidence=DEFAULTS['confidence'], target_face_percentage=DEFAULTS['target_face_percentage'], debug=False):
         self.debug = debug
         self.confidence = confidence
         self.target_face_percentage = target_face_percentage
@@ -31,6 +39,12 @@ class FaceDetector():
 
         self.easing = 0.1
 
+        self.zoom = DEFAULTS['zoom']
+
+        Thread.__init__(self)
+        self.daemon = True
+        self.start()
+
     def get_faces(self, img):
         blob = cv2.dnn.blobFromImage(
             img, 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
@@ -51,21 +65,26 @@ class FaceDetector():
 
         return faces
 
-    def zoom_at(self, img, zoom=1, angle=0, coord=None):
+    def zoom_at(self, img, zoom=DEFAULTS['zoom'], angle=0, coord=None):
         # focus on the center of previous frame + easing in the direction of the center of the face in the current image if no coord is given then use the center of the face in the current image
         if not self.cxp:
             self.cxp = coord[0]
             self.cyp = coord[1]
-
+        
+        # if coordinates aren't supplied, use the center of the image
         if coord is None:
             coord = (img.shape[1] / 2, img.shape[0] / 2)
 
+        # ease our way towards the current value
         cx = self.cxp + (coord[0] - self.cxp) * self.easing
         cy = self.cyp + (coord[1] - self.cyp) * self.easing
 
+        # ease the zoom in towards the target value
+        zoom = self.zoom + (zoom - self.zoom) * self.easing
+
         # draw circle at current center
         if self.debug:
-            cv2.circle(img, (int(cx), int(cy)), 3, (0, 0, 255), -1)
+            cv2.circle(img, (int(cx), int(cy)), int(zoom), (0, 0, 255), -1)
 
         # get the center of the face in the previous frame
         rot_mat = cv2.getRotationMatrix2D((cx, cy), angle, zoom)
@@ -74,12 +93,17 @@ class FaceDetector():
 
         self.cxp = cx
         self.cyp = cy
+        self.zoom = zoom
 
         return result
 
     def zoom_at_face(self, img, faces):
+        color = (0, 0, 255)
+
         # if has face in frame then zoom in on face otherwise use face_location as zoom target
         if len(faces) > 0:
+            color = (0, 255, 0)
+
             x, y, w, h = faces[0]
             self.face_location = (x, y, w, h)
 
@@ -94,7 +118,7 @@ class FaceDetector():
 
             # draw rectangle around face
             if self.debug:
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
 
             img = self.zoom_at(
                 img,
@@ -106,7 +130,7 @@ class FaceDetector():
         return img
 
     def run(self):
-        while True:
+        while self.cap.isOpened():
             # Capture frame-by-frame
             ret, img = self.cap.read()
 
@@ -154,7 +178,6 @@ def main():
         debug=True
     )
     face.run()
-
 
 if __name__ == '__main__':
     main()
