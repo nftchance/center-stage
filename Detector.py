@@ -41,10 +41,6 @@ class FaceDetector(Thread):
 
         self.zoom = DEFAULTS['zoom']
 
-        Thread.__init__(self)
-        self.daemon = True
-        self.start()
-
     def get_faces(self, img):
         blob = cv2.dnn.blobFromImage(
             img, 1.0, (300, 300), (104.0, 177.0, 123.0), swapRB=False, crop=False)
@@ -130,7 +126,11 @@ class FaceDetector(Thread):
         return img
 
     def run(self):
-        while self.cap.isOpened():
+        print('Inside run')
+        while True:
+            if not self.cap.isOpened():
+                break
+
             # Capture frame-by-frame
             ret, img = self.cap.read()
 
@@ -180,4 +180,5 @@ def main():
     face.run()
 
 if __name__ == '__main__':
+    print('Running file')
     main()
