@@ -103,10 +103,9 @@ class FaceDetector(Thread):
 
             x, y, w, h = faces[0]
             self.face_location = (x, y, w, h)
-
-            self.zoom_decay = 0
+            self.zoom_decay = 0.0
         else:
-            self.zoom_decay += self.easing
+            self.zoom_decay = self.zoom_decay + self.easing if self.zoom_decay < 1 else 1
 
         # if has face location zoom in to last location
         if self.face_location:
@@ -114,8 +113,9 @@ class FaceDetector(Thread):
 
             # zoom in on face
             face_percentage = (h / img.shape[0]) * 100
-            zoom_factor = 1 + \
-                (1 - (face_percentage / self.target_face_percentage))
+            zoom_factor = 1 + (1 - (face_percentage / self.target_face_percentage)) - self.zoom_decay
+
+            if zoom_factor < 1: zoom_factor = 1
 
             # draw rectangle around face
             if self.debug:
@@ -131,6 +131,7 @@ class FaceDetector(Thread):
         return img
 
     def run(self):
+        print('Inside run')
         fmt = pyvirtualcam.PixelFormat.BGR
         # use pvirtual came to get the frame
         with pyvirtualcam.Camera(width=int(self.w), height=int(self.h), fps=28.4, fmt=fmt) as cam:
@@ -167,6 +168,7 @@ class FaceDetector(Thread):
                         fps), (0, 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
                     fps = f"{int(fps)}"
 
+
                 # Flip frame
                 img = cv2.flip(img, 1) 
 
@@ -186,8 +188,8 @@ class FaceDetector(Thread):
 def main():
     face = FaceDetector(
         'models/haarcascade_frontalface_default.xml',
-        confidence=0.50,
-        target_face_percentage=50,
+        confidence=0.5,
+        target_face_percentage=40,
         debug=False
     )
     face.run()
