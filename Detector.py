@@ -1,5 +1,6 @@
 import cv2
 import numpy
+import pyvirtualcam
 import time
 
 from threading import Thread
@@ -8,7 +9,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 DEFAULTS = {
     'confidence': 0.65,
-    'target_face_percentage': 90,
+    'target_face_percentage': 80,
     'zoom': 1.0,
 }
 
@@ -40,6 +41,7 @@ class FaceDetector(Thread):
         self.easing = 0.05
 
         self.zoom = DEFAULTS['zoom']
+        self.zoom_decay = 0
 
     def get_faces(self, img):
         blob = cv2.dnn.blobFromImage(
@@ -102,6 +104,10 @@ class FaceDetector(Thread):
             x, y, w, h = faces[0]
             self.face_location = (x, y, w, h)
 
+            self.zoom_decay = 0
+        else:
+            self.zoom_decay += self.easing
+
         # if has face location zoom in to last location
         if self.face_location:
             (x, y, w, h) = self.face_location
@@ -125,45 +131,53 @@ class FaceDetector(Thread):
         return img
 
     def run(self):
-        print('Inside run')
-        while True:
-            if not self.cap.isOpened():
-                break
+        fmt = pyvirtualcam.PixelFormat.BGR
+        # use pvirtual came to get the frame
+        with pyvirtualcam.Camera(width=int(self.w), height=int(self.h), fps=28.4, fmt=fmt) as cam:
+            print(f'Using virtual camera: {cam.device}')
 
-            # Capture frame-by-frame
-            ret, img = self.cap.read()
+            while True:
+                if not self.cap.isOpened():
+                    break
 
-            if not ret:
-                break
+                # Capture frame-by-frame
+                ret, img = self.cap.read()
 
-            # faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
-            faces = self.get_faces(img)
+                if not ret:
+                    break
 
-            # Center the screen on the faces in the image
-            img = self.zoom_at_face(img, faces)
+                # faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+                faces = self.get_faces(img)
 
-            if self.debug:
-                # Display the resulting frame
-                self.new_frame_time = time.time()
+                # Center the screen on the faces in the image
+                img = self.zoom_at_face(img, faces)
 
-                # fps will be number of frame processed in given time frame
-                # since their will be most of time error of 0.001 second
-                # we will be subtracting it to get more accurate result
-                fps = 1 / (self.new_frame_time - self.prev_frame_time)
-                self.prev_frame_time = self.new_frame_time
+                if self.debug:
+                    # Display the resulting frame
+                    self.new_frame_time = time.time()
 
-                # Display FPS on frame
-                cv2.putText(img, "FPS: {:.2f}".format(
-                    fps), (0, 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
-                fps = f"{int(fps)}"
+                    # fps will be number of frame processed in given time frame
+                    # since their will be most of time error of 0.001 second
+                    # we will be subtracting it to get more accurate result
+                    fps = 1 / (self.new_frame_time - self.prev_frame_time)
+                    self.prev_frame_time = self.new_frame_time
 
-            # zoom in on face
-            cv2.imshow('img', img)
+                    # Display FPS on frame
+                    cv2.putText(img, "FPS: {:.2f}".format(
+                        fps), (0, 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
+                    fps = f"{int(fps)}"
 
-            # Press Escape on keyboard to  exit
-            k = cv2.waitKey(30) & 0xff
-            if k == 27:
-                break
+                # Flip frame
+                img = cv2.flip(img, 1) 
+
+                # zoom in on face
+                cam.send(img)
+                cam.sleep_until_next_frame()
+
+                # Press Escape on keyboard to  exit
+                k = cv2.waitKey(30) & 0xff
+                if k == 27:
+                    break
 
         self.cap.release()
         cv2.destroyAllWindows()
@@ -172,12 +186,11 @@ class FaceDetector(Thread):
 def main():
     face = FaceDetector(
         'models/haarcascade_frontalface_default.xml',
-        confidence=0.65,
-        target_face_percentage=90,
-        debug=True
+        confidence=0.50,
+        target_face_percentage=50,
+        debug=False
     )
     face.run()
 
 if __name__ == '__main__':
-    print('Running file')
     main()
