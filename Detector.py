@@ -37,7 +37,7 @@ class FaceDetector(Thread):
         self.cyp = None
         self.cxp = None
 
-        self.easing = 0.1
+        self.easing = 0.05
 
         self.zoom = DEFAULTS['zoom']
 
@@ -60,7 +60,6 @@ class FaceDetector(Thread):
                     numpy.array([self.w, self.h, self.w, self.h])
 
                 (startX, startY, endX, endY) = box.astype("int")
-
                 faces.append((startX, startY, endX - startX, endY - startY))
 
         return faces
