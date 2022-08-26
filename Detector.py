@@ -1,9 +1,9 @@
 import cv2
 import numpy
+import os
 import pyvirtualcam
+import sys
 import time
-
-from threading import Thread
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
@@ -13,7 +13,7 @@ DEFAULTS = {
     'zoom': 1.0,
 }
 
-class FaceDetector(Thread):
+class FaceDetector:
     def __init__(self, cascade_path, confidence=DEFAULTS['confidence'], target_face_percentage=DEFAULTS['target_face_percentage'], debug=False):
         self.debug = debug
         self.confidence = confidence
@@ -41,10 +41,17 @@ class FaceDetector(Thread):
 
         self.face_location = None
 
-        self.face_model = cv2.dnn.readNetFromCaffe(
-            'models/res10_300x300_ssd_iter_140000.prototxt',
-            'models/res10_300x300_ssd_iter_140000.caffemodel'
-        )
+        if getattr(sys, 'frozen', False):
+            self.face_model = cv2.dnn.readNetFromCaffe(
+                os.path.join(sys._MEIPASS, "res10_300x300_ssd_iter_140000.prototxt"),
+                os.path.join(sys._MEIPASS, "res10_300x300_ssd_iter_140000.caffemodel")
+            )
+        else:
+            self.face_model = cv2.dnn.readNetFromCaffe(
+                'models/res10_300x300_ssd_iter_140000.prototxt',
+                'models/res10_300x300_ssd_iter_140000.caffemodel'
+            )
+        
 
         self.cyp = None
         self.cxp = None
