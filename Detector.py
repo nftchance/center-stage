@@ -20,15 +20,26 @@ class FaceDetector(Thread):
         self.target_face_percentage = target_face_percentage
 
         self.cap = cv2.VideoCapture(0)
+
+        self.pref_width = 1280
+        self.pref_height = 720
+        self.pref_fps_in = 30
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.pref_width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.pref_height)
+        self.cap.set(cv2.CAP_PROP_FPS, self.pref_fps_in)
+
+        # Query final capture device values (may be different from preferred settings).
+        self.w = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.h = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.fps_in = self.cap.get(cv2.CAP_PROP_FPS)
+        print(f'Webcam capture started ({self.w}x{self.h} @ {self.fps_in}fps)')
+
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
         self.prev_frame_time = 0
         self.new_frame_time = 0
 
         self.face_location = None
-
-        self.w = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.h = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
         self.face_model = cv2.dnn.readNetFromCaffe(
             'models/res10_300x300_ssd_iter_140000.prototxt',
@@ -137,10 +148,7 @@ class FaceDetector(Thread):
         with pyvirtualcam.Camera(width=int(self.w), height=int(self.h), fps=28.4, fmt=fmt) as cam:
             print(f'Using virtual camera: {cam.device}')
 
-            while True:
-                if not self.cap.isOpened():
-                    break
-
+            while self.cap.isOpened():
                 # Capture frame-by-frame
                 ret, img = self.cap.read()
 
@@ -152,6 +160,9 @@ class FaceDetector(Thread):
 
                 # Center the screen on the faces in the image
                 img = self.zoom_at_face(img, faces)
+
+                # Flip frame
+                img = cv2.flip(img, 1) 
 
                 if self.debug:
                     # Display the resulting frame
@@ -168,28 +179,27 @@ class FaceDetector(Thread):
                         fps), (0, 30), font, 1, (0, 0, 255), 2, cv2.LINE_AA)
                     fps = f"{int(fps)}"
 
+                    cv2.imshow('Center Stage' if not self.debug else '[Debug] Center Stage', img)
 
-                # Flip frame
-                img = cv2.flip(img, 1) 
+                    # Press Escape on keyboard to  exit
+                    k = cv2.waitKey(30) & 0xff
+                    if k == 27:
+                        break
 
-                # zoom in on face
-                cam.send(img)
-                cam.sleep_until_next_frame()
-
-                # Press Escape on keyboard to  exit
-                k = cv2.waitKey(30) & 0xff
-                if k == 27:
-                    break
+                    cv2.destroyAllWindows()
+                else:
+                    # zoom in on face
+                    cam.send(img)
 
         self.cap.release()
-        cv2.destroyAllWindows()
 
 
 def main():
+    print("Stepping inside the main")
     face = FaceDetector(
         'models/haarcascade_frontalface_default.xml',
         confidence=0.5,
-        target_face_percentage=40,
+        target_face_percentage=50,
         debug=False
     )
     face.run()
