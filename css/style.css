@@ -8,6 +8,13 @@
     padding: 0;
 }
 
+video { 
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
 /* break webcam and microphone input into two columns */
 .inputs {
     display: grid;
@@ -25,7 +32,7 @@ select {
     width: 100%;
     height: 30px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 2px;
     padding: 5px;
     font-size: 14px;
     color: #555;
@@ -59,7 +66,8 @@ input[type="checkbox"] + label:before {
     display: block;
     width: 20px;
     height: 20px;
-    border: 1px solid #6cc0e5;
+    border: 1px solid #ccc;
+    border-radius: 2px;
     position: absolute;
     left: 0;
     top: 0;
@@ -72,24 +80,10 @@ input[type="checkbox"]:checked + label:before {
     width: 10px;
     top: -5px;
     left: 5px;
-    border-radius: 0;
+    border-radius: 2px;
     opacity: 1;
     border-top-color: transparent;
     border-left-color: transparent;
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
-}
-
-input[type="checkbox"]:checked + label:after {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 10px;
-    border-radius: 0;
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    background: #6cc0e5;
     -webkit-transform: rotate(45deg);
     transform: rotate(45deg);
 }
@@ -98,20 +92,6 @@ input[type="checkbox"]:focus + label:before {
     outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px;
-}
-
-input[type="checkbox"]:checked + label:after {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 10px;
-    border-radius: 0;
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    background: #6cc0e5;
-    -webkit-transform: rotate(45deg);
-    transform: rotate(45deg);
 }
 
 input[type="checkbox"]:disabled + label {
@@ -143,7 +123,7 @@ button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 2px;
 }
 
 button:hover {
@@ -158,9 +138,20 @@ button:disabled {
 }
 
 #sound-level { 
-    width: 100%;
-    height: 15px;
-    background-color: #ccc;
-    border-radius: 5px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
     margin-block: 20px;
+}
+
+#sound-level-value { 
+    width: 0%;
+    height: 25px;
+    background-color: #6cc0e5;
+    border-radius: 2px;
+}
+
+@media only screen and (max-width: 600px) {
+    .inputs {
+        grid-template-columns: 1fr;
+    }
 }

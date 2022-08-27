@@ -81,8 +81,8 @@ function startPreview() {
             const arraySum = array.reduce((a, value) => a + value, 0);
             const average = arraySum / array.length;
 
-            document.getElementById('sound-level').style.width = Math.round(average) + '%';
-            document.getElementById('sound-level').style.backgroundColor = 'rgb(' + Math.round(average * 2.55) + ',' + Math.round(255 - average * 2.55) + ',0)';                                
+            document.getElementById('sound-level-value').style.width = Math.round(average) + '%';
+            document.getElementById('sound-level-value').style.backgroundColor = 'rgb(' + Math.round(average * 2.55) + ',' + Math.round(255 - average * 2.55) + ',0)';                                
         };        
     }).catch(function (error) {
         console.log(error.name + ': ' + error.message);
