@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+	<meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+	<title>Center Stage</title>
+
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+
+<body>
+	<div class="container">
+		<!-- Display the video element -->
+		<video id="video" autoplay></video>
+
+		<div class="inputs">
+			<!-- Choose your camera -->
+			<div class="input-group">
+				<label for="camera-select">Camera:</label>
+				<select id="camera-select"></select>
+			</div>
+
+
+			<!-- Choose your microphone -->
+			<div class="input-group">
+				<label for="microphone-select">Microphone:</label>
+				<select id="microphone-select"></select>
+			</div>
+		</div>
+
+		<!-- Display the sound response of the microphone input -->
+		<div id="sound-level"></div>
+
+		<!-- Run on startup checkbox -->
+		<input type="checkbox" id="run-on-startup" />
+		<label for="run-on-startup">Run on startup</label>
+
+		<!-- Flip video preview checkbox -->
+		<input type="checkbox" id="flip-video-preview" />
+		<label for="flip-video-preview">Flip video preview</label>
+
+		<!-- Button to start stream -->
+		<button id="preview">Start Stream</button>
+	</div>
+</body>
+
+<script src="center-stage.js"></script>
+
+</html>

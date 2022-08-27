@@ -8,10 +8,10 @@ This is extremely resource intensive, so everything is handled on the GPU side o
 
 ## TODO
 
-- [ ] Figure out how to build a CUDA implementation that will work on all computers instead of just mine...
-    - [ ] This will always only work with NVIDIA GPUs?
-- [ ] Figure out how to get Python -> Executable File.
 - [ ] Figure out how to run app minimized in tray since all it really is, is a source connection.
-- [ ] Confirm that this would already work for things like OBS if one was to setup a `Window Capture` on this window.
+- [x] Confirm that this would already work for things like OBS if one was to setup a `Window Capture` on this window.
 - [ ] Figure out how to get this to show up as source so that one could use it as a camera in things like Zoom.
     - This should be as simple as it is to setup Snap Camera.
+    - The simplest way that I have found to do this so far is by mirroring this into a Virtual Camera
+- [ ] Figure out how to build a CUDA implementation that will work on all computers instead of just mine...
+    - [ ] This will always only work with NVIDIA GPUs?
