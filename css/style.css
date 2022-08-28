@@ -6,6 +6,7 @@
     width: 100%;
     margin: 0 auto;
     padding: 0;
+    max-width: 720px;
 }
 
 video { 
@@ -13,6 +14,10 @@ video {
     height: auto;
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+video.flip { 
+    transform: scaleX(-1);
 }
 
 /* break webcam and microphone input into two columns */
@@ -26,6 +31,7 @@ label {
     display: block;
     margin: 0;
     padding: 0;
+    margin-top: 10px;
 }
 
 select {
@@ -112,18 +118,43 @@ input[type="checkbox"]:disabled:checked + label:after {
     background-color: #999;
 }
 
-button { 
-    background-color: #6cc0e5;
-    border: none;
-    color: #fff;
-    padding: 10px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
+/* Range slider a full width slider that is filled with a gradient as the handle is dragged */
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: #f5f5f5;
+    border: 0;
     border-radius: 2px;
+    padding: 0;
+    margin: 0;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 5px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #000000;
+    background: linear-gradient(90deg, rgb(226, 123, 123), rgb(165, 165, 207));
+    border-radius: 1px;
+    border: 0px solid #000000;
+}
+
+/* thumb control of range slider that has white background with soft gray border at 50% */
+input[type="range"]::-webkit-slider-thumb {
+    box-shadow: 0px 0px 0px #000000, 0px 0px 0px #000000;
+    border: 1px solid #ccc;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -8px;
+}
+
+input[type="range"]:focus {
+    outline: none;
 }
 
 button:hover {

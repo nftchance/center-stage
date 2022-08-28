@@ -13,7 +13,9 @@
     "start": "electron ."
   },
   "dependencies": {
+    "auto-launch": "^5.0.5",
     "express": "^4.18.1",
+    "face-api.js": "^0.22.2",
     "quick-local-ip": "^1.0.7",
     "ws": "^8.8.1"
   }

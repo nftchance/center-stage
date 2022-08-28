@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Tray, Menu } = require('electron');
-const path = require('path')
+const path = require('path');
 
 let window;
 let isQuiting;

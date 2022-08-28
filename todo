@@ -1,0 +1,12 @@
+✔ create container that is only a max width and doesn't blow things out ever @done(22-08-27 13:24)
+✘ implement sound level pips @cancelled(22-08-27 17:03)
+☐ figure out how we can get device ids out of the option values
+☐ implement user settings
+    ✔ persistent values @done(22-08-27 14:42)
+    ☐ run on startup
+        -- although this control is implemented, 
+    ✔ flip video preview @done(22-08-27 13:34)
+        -- notes: we can simply flip the video preview if we want to flip the video preview however that will not flip the output once we connect a virtual camera or start handling the output so we will have to figure that out when we get there, but for now. MVP functionality within the app is functional.
+    ✔ zoom level @done(22-08-27 17:03)
+    ✔ tracking rate @done(22-08-27 17:03)
+    ✔ face percentage @done(22-08-27 17:03)
